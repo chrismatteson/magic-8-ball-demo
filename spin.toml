@@ -1,0 +1,24 @@
+spin_manifest_version = "1"
+authors = ["Chris Matteson <chris.matteson@gmail.com>"]
+description = ""
+name = "magic-8-ball-demo"
+trigger = { type = "http", base = "/" }
+version = "0.1.0"
+
+[[component]]
+source = { url = "https://github.com/fermyon/spin-fileserver/releases/download/v0.0.3/spin_static_fs.wasm", digest = "sha256:38bf971900228222f7f6b2ccee5051f399adca58d71692cdfdea98997965fd0d" }
+id = "frontend"
+files = [ { source = "static", destination = "/" } ]
+[component.trigger]
+route = "/..."
+
+[[component]]
+id = "backend"
+source = "backend/target/backend.wasm"
+ai_models = ["llama2-chat"]
+[component.trigger]
+route = "/api"
+[component.build]
+command = "npm run build"
+workdir = "backend"
+

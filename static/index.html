@@ -1,0 +1,71 @@
+<html>
+<head>
+    <title>Spin Magic Eight Ball</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png" />
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+    <h1>Ask the Magic Eight Ball a Question</h1>
+    <p>Powered by Fermyon Serverless AI</p>
+    <input type="text" id="question" placeholder="Ask Question" onkeypress="infer(event)">
+    <p>
+        <button id="btn" onclick="infer(event)">Spin the ball!</button>
+    </p>
+    <div id="magicEightBall">
+        <div id="circle"></div>
+        <div id="triangle"></div>
+        <div id="reply"></div>
+        <img src="icon/magic-eight-ball.png"/>
+    </div>
+
+    <div style="text-align: center;">
+        <label for="temperature">Temperature: <span id="temperatureValue">0.25</span></label>
+        <input type="range" id="temperature" min="0" max="1" step="0.01" value="0.25" oninput="updateSliderValue('temperature', 'temperatureValue')">
+
+        <label for="maxTokens">Max Tokens: <span id="maxTokensValue">20</span></label>
+        <input type="range" id="maxTokens" min="1" max="50" value="20" oninput="updateSliderValue('maxTokens', 'maxTokensValue')">
+
+        <label for="top_p">Top P: <span id="top_pValue">0.25</span></label>
+        <input type="range" id="top_p" min="0" max="1" step="0.01" value="0.25" oninput="updateSliderValue('top_p', 'top_pValue')">
+
+        <label for="top_k">Top K: <span id="top_kValue">5</span></label>
+        <input type="range" id="top_k" min="1" max="100" value="5" oninput="updateSliderValue('top_k', 'top_kValue')">
+    </div>
+
+    <script>
+        function infer(event) {
+            if (event.key == "Enter" || event.type == "click") {
+                var question = document.getElementById("question").value;
+                if (question == "") { return; }
+
+                // Get slider values
+                var temperature = document.getElementById("temperature").value;
+                var maxTokens = document.getElementById("maxTokens").value;
+                var top_p = document.getElementById("top_p").value;
+                var top_k = document.getElementById("top_k").value;
+
+                document.getElementById("triangle").style.display = 'inline-block';
+                document.getElementById("circle").style.display = 'inline-block';
+                document.getElementById("reply").style.display = 'inline-block';
+                document.getElementById("reply").innerHTML = "Spinning...";
+
+                fetch('../api', {
+                    method: 'POST',
+                    body: JSON.stringify({ question, temperature, maxTokens, top_p, top_k }),
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(response => response.json()).then(data => {
+                    document.getElementById("reply").innerHTML = data.answer;
+                })
+            }
+        }
+
+        function updateSliderValue(sliderId, displayId) {
+            var slider = document.getElementById(sliderId);
+            var display = document.getElementById(displayId);
+            display.innerHTML = slider.value;
+        }
+    </script>
+</body>
+</html>
